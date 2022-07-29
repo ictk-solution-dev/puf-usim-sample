@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "324809546892",
+    "project_id": "usim-puf-o2o-demo",
+    "storage_bucket": "usim-puf-o2o-demo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324809546892:android:e0548789937593a6946fa9",
+        "android_client_info": {
+          "package_name": "com.ictkholdings.nftpufsample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "324809546892-i8gvc1ssn6jacc14b7do5jbrmd1t5hiu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrRcy1HfcWg0eqrrTw5VjhZuRGhWfwBDY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "324809546892-i8gvc1ssn6jacc14b7do5jbrmd1t5hiu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+        <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+            tools:ignore="UselessParent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <Button
+            android:id="@+id/base_sample_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="BASE" />
+
+
+        <Button
+            android:id="@+id/uid_sample_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="UID" />
+
+
+        <Button
+            android:id="@+id/verify_pwd_sample_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="VERIFY PWD" />
+
+        <Button
+            android:id="@+id/update_pwd_sample_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="UPDATE NEW PWD" />
+        <Button
+            android:id="@+id/verify_new_pwd_sample_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="VERIFY NEW PWD" />
+        <Button
+            android:id="@+id/init_pw_sample_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="UPDATE INIT PWD" />
+        <Button
+            android:id="@+id/verify_pwd_by_secure_sample_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="VERIFY PWD BY SECURE STORE" />
+
+
+
+
+        <Button
+            android:id="@+id/get_puk_sample_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="GET PUK" />
+
+
+        <Button
+            android:id="@+id/decrypt_test_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="DECRYPT TEST" />
+
+
+        <Button
+            android:id="@+id/sign_ecdsa_sample_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="SIGN ECDSA" />
+
+        <Button
+            android:id="@+id/key_store_sample"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="SIGN ECDSA" />
+        <TextView
+            android:id="@+id/sample_result"
+            android:layout_width="match_parent"
+            android:layout_height="147dp"
+            android:layout_gravity="center_horizontal"
+            android:text="RESULT" />
+
+
+
+    </LinearLayout>
+
+</ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
