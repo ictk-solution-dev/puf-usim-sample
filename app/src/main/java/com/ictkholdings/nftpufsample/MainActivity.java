@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
 	public void showSetting(){
 		//Intent intent = new Intent(getApplicationContext(), Test_Login.class);
-		Intent intent = new Intent(getApplicationContext(), Test_debug.class);//neo1seok test
+		Intent intent = new Intent(getApplicationContext(), TestPufAC.class);//neo1seok test
 		startActivity(intent);
 	}
 }

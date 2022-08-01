@@ -23,13 +23,21 @@ import org.bouncycastle.asn1.ASN1Integer;
 
 
 public class EcdsaResult {
-	byte[] R;
-	byte[] S;
-
+//	byte[] R;
+//	byte[] S;
+	BigInteger m_BR;
+	BigInteger m_BS;
 
 	EcdsaResult(Object R_, Object S_) {
-		R = Util.toBytes(R_);
-		S = Util.toBytes(S_);
+		m_BR = Util.toBigInteger(Util.toBytes(R_));
+		m_BS = Util.toBigInteger(Util.toBytes(S_));
+
+	}
+	EcdsaResult(BigInteger R_, BigInteger S_) throws IOException {
+		m_BR = R_;
+		m_BS = S_;
+//		R = Util.toBytesFromBigInteger(R_,32);
+//		S = Util.toBytesFromBigInteger(S_,32);
 
 	}
 
@@ -45,8 +53,8 @@ public class EcdsaResult {
 		BigInteger BR = ((ASN1Integer) obj.getObjectAt(0)).getValue();
 		BigInteger BS = ((ASN1Integer) obj.getObjectAt(1)).getValue();
 
-
-		return new EcdsaResult(Util.toBytesFromBigInteger(BR, 32), Util.toBytesFromBigInteger(BS, 32));
+		return new EcdsaResult(BR,BS);
+		//return new EcdsaResult(Util.toBytesFromBigInteger(BR, 32), Util.toBytesFromBigInteger(BS, 32));
 
 	}
 	public static EcdsaResult FromRAWBYTES(Object rawbytes)
@@ -69,8 +77,8 @@ public class EcdsaResult {
 
 
 
-		vector.add(new ASN1Integer(Util.toBigInteger(this.R)));
-		vector.add(new ASN1Integer(Util.toBigInteger(this.S)));
+		vector.add(new ASN1Integer(this.m_BR));
+		vector.add(new ASN1Integer(this.m_BS));
 
 
 		outstrema.writeObject(new DERSequence(vector));
@@ -80,9 +88,22 @@ public class EcdsaResult {
 
 	}
 	public byte[] toRAWBYTES() throws IOException {
+		//		R = Util.toBytesFromBigInteger(R_,32);
+//		S = Util.toBytesFromBigInteger(S_,32);
 
-		return Util.joinBytes(R,S);
 
+		return Util.joinBytes(
+				Util.toBytesFromBigInteger(this.m_BR,32),
+				Util.toBytesFromBigInteger(this.m_BS,32));
+
+	}
+	public BigInteger getR(){
+
+		return m_BR;
+	}
+	public BigInteger getS(){
+
+		return m_BS;
 	}
 	public static void main(String[] args) throws Exception {
 

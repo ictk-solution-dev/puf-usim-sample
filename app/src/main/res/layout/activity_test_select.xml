@@ -17,7 +17,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="SELECT  USIM PUF" />
+            android:text="SELECT  PUF PW" />
+
+        <Button
+            android:id="@+id/select_test_etc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="SELECT WALLET KEY" />
 
         <Button
             android:id="@+id/select_init"
@@ -25,12 +32,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="USIM PUF PW 초기화" />
-        <Button
-            android:id="@+id/select_test_etc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="SELECT ETC" />
 
         <TextView
             android:id="@+id/sample_result"

@@ -30,13 +30,14 @@ public class Test_Select extends AppCompatActivity {
 
         sample_result = findViewById(R.id.sample_result);;
 
+
         ((Button) findViewById(R.id.select_test_etc)).setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
                     //getBuildSample(sample_result);
-                    //Intent intent = new Intent(getApplicationContext(), Test_PqcTls.class);//neo1seok test
-                    //startActivity(intent);
+                    Intent intent = new Intent(getApplicationContext(), TestWallet.class);//neo1seok test
+                    startActivity(intent);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -49,7 +50,7 @@ public class Test_Select extends AppCompatActivity {
             public void onClick(View v) {
                 try {
                     //getBuildSample(sample_result);
-                    Intent intent = new Intent(getApplicationContext(), Test_debug.class);//neo1seok test
+                    Intent intent = new Intent(getApplicationContext(), TestPufAC.class);//neo1seok test
                     startActivity(intent);
                 } catch (Exception e) {
                     e.printStackTrace();

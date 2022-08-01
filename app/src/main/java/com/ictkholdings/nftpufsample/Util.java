@@ -188,31 +188,47 @@ public class Util {
 
 	}
 
-	public static byte[]  encValue(Object aes_key,Object msg) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
+	public static byte[]  aesCbc (int mode, Object aes_key,Object msg,Object iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
 
 		byte[] baes_key = toBytes(aes_key);
 		byte[] bmsg = toBytes(msg);
+		byte[] biv = toBytes(iv);
 		Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
 
 		Key key = new SecretKeySpec(baes_key, "AES");
-		cipher.init(Cipher.ENCRYPT_MODE, key,new IvParameterSpec(new byte[16]));
+		cipher.init(mode, key,new IvParameterSpec(biv));
 		byte[] enc = cipher.doFinal(bmsg);
-
 		return enc;
+
+	}
+
+	public static byte[]  encValue(Object aes_key,Object msg) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
+
+//		byte[] baes_key = toBytes(aes_key);
+//		byte[] bmsg = toBytes(msg);
+//		Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+//
+//		Key key = new SecretKeySpec(baes_key, "AES");
+//		cipher.init(Cipher.ENCRYPT_MODE, key,new IvParameterSpec(new byte[16]));
+//		byte[] enc = cipher.doFinal(bmsg);
+
+		return aesCbc(Cipher.ENCRYPT_MODE,aes_key,msg,new byte[16]);
 
 	}
 
 	public static byte[]  decValue(Object aes_key,Object msg) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
 
-		byte[] baes_key = toBytes(aes_key);
-		byte[] bmsg = toBytes(msg);
-		Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-
-		Key key = new SecretKeySpec(baes_key, "AES");
-		cipher.init(Cipher.DECRYPT_MODE, key,new IvParameterSpec(new byte[16]));
-		byte[] enc = cipher.doFinal(bmsg);
-
-		return enc;
+		return aesCbc(Cipher.DECRYPT_MODE,aes_key,msg,new byte[16]);
+//
+//		byte[] baes_key = toBytes(aes_key);
+//		byte[] bmsg = toBytes(msg);
+//		Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+//
+//		Key key = new SecretKeySpec(baes_key, "AES");
+//		cipher.init(Cipher.DECRYPT_MODE, key,new IvParameterSpec(new byte[16]));
+//		byte[] enc = cipher.doFinal(bmsg);
+//
+//		return enc;
 	}
 	public static byte[]  decValuePkcs7(Object aes_key,Object msg,Object iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
 

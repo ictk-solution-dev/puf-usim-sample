@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Test_ETC">
+    tools:context=".TestWallet">
 
 
     <LinearLayout
@@ -18,11 +18,29 @@
             android:layout_gravity="center_horizontal"
             android:text="ECDSA DER SAMPLE" />
 
+        <Button
+            android:id="@+id/sign_ecdsa_sample_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="SIGN PUF  ECDSA" />
+        <Button
+            android:id="@+id/sign_ecdsa_r1_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="SIGN R1 ECDSA" />
+        <Button
+            android:id="@+id/sign_ecdsa_k1_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="SIGN K1 ECDSA" />
 
         <TextView
             android:id="@+id/sample_result"
             android:layout_width="match_parent"
-            android:layout_height="147dp"
+            android:layout_height="683dp"
             android:layout_gravity="center_horizontal"
             android:text="RESULT" />
 

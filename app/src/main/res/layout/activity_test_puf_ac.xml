@@ -4,7 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp">
+    android:padding="10dp"
+    tools:context=".TestPufAC">
+
+
 
         <ScrollView
         android:layout_width="match_parent"
@@ -63,45 +66,27 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="VERIFY PWD BY SECURE STORE" />
-
-
-
-
         <Button
-            android:id="@+id/get_puk_sample_button"
+            android:id="@+id/write_r1_key_sample_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="GET PUK" />
-
+            android:text="WRITE R1 KEY" />
 
         <Button
-            android:id="@+id/decrypt_test_button"
+            android:id="@+id/write_k1_key_sample_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="DECRYPT TEST" />
-
-
-        <Button
-            android:id="@+id/sign_ecdsa_sample_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="SIGN ECDSA" />
-
-        <Button
-            android:id="@+id/key_store_sample"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="SIGN ECDSA" />
+            android:text="WRITE K1 KEY" />
         <TextView
             android:id="@+id/sample_result"
             android:layout_width="match_parent"
-            android:layout_height="147dp"
+            android:layout_height="683dp"
             android:layout_gravity="center_horizontal"
             android:text="RESULT" />
+
+
 
 
 

@@ -23,8 +23,8 @@ import java.util.Arrays;
 
 //import static com.ictkholdings.pqc2nd_sample.App.mClient;
 
-public class Test_debug extends AppCompatActivity {
-    private static final String LOG_TAG = Test_debug.class.getSimpleName();
+public class TestPufAC extends AppCompatActivity {
+    private static final String LOG_TAG = TestPufAC.class.getSimpleName();
 
     private TextView sample_result;
 
@@ -39,7 +39,7 @@ public class Test_debug extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_debug);
+        setContentView(R.layout.activity_test_puf_ac);
 
 
         sample_result = findViewById(R.id.sample_result);;
@@ -140,7 +140,36 @@ public class Test_debug extends AppCompatActivity {
                     }
                 });
 
+        ((Button) findViewById(R.id.write_r1_key_sample_button))
+                .setOnClickListener(new Button.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        try {
 
+                            writeKeySample(sample_result,UsimPufHandler.EC_MODE_PRK_R1);
+                            //verifyPwdScureStoreSample(sample_result);
+                        } catch (UsimConnectionException e) {
+                            sample_result.setText(e.toString());
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                });
+        ((Button) findViewById(R.id.write_k1_key_sample_button))
+                .setOnClickListener(new Button.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        try {
+                            writeKeySample(sample_result,UsimPufHandler.EC_MODE_PRK_K1);
+                        } catch (UsimConnectionException e) {
+                            sample_result.setText(e.toString());
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                });
 
         ((Button) findViewById(R.id.init_pw_sample_button))
             .setOnClickListener(new Button.OnClickListener() {
@@ -159,48 +188,35 @@ public class Test_debug extends AppCompatActivity {
         });
 
 
-
-        ((Button) findViewById(R.id.get_puk_sample_button))
-            .setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    getPukSample(sample_result);
-                } catch (UsimConnectionException e) {
-                    e.printStackTrace();
-                }
-
-
-            }
-        });
-
-        ((Button) findViewById(R.id.decrypt_test_button)).setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    decryptTest(findViewById(R.id.sample_result));
-                } catch (UsimConnectionException e) {
-                    e.printStackTrace();
-                }
-
-
-            }
-        });
-
-
-
-        ((Button) findViewById(R.id.sign_ecdsa_sample_button)).setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    signEcdsaSample(sample_result);
-                } catch (UsimConnectionException e) {
-                    e.printStackTrace();
-                }
+//
+//        ((Button) findViewById(R.id.get_puk_sample_button))
+//            .setOnClickListener(new Button.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                try {
+//                    getPukSample(sample_result);
+//                } catch (UsimConnectionException e) {
+//                    e.printStackTrace();
+//                }
+//
+//
+//            }
+//        });
+//
+//        ((Button) findViewById(R.id.decrypt_test_button)).setOnClickListener(new Button.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                try {
+//                    decryptTest(findViewById(R.id.sample_result));
+//                } catch (UsimConnectionException e) {
+//                    e.printStackTrace();
+//                }
+//
+//
+//            }
+//        });
 
 
-            }
-        });
 
 
 
@@ -433,6 +449,42 @@ public class Test_debug extends AppCompatActivity {
         }
         usimpufhandler.G3_CloseChannel();
     }
+    public void writeKeySample(TextView result,int mode) throws UsimConnectionException {
+        usimpufhandler.wait_to_connected();
+        usimpufhandler.G3_OpenChannel();
+        usimpufhandler.G3_WakeUp();
+        int key_index =0;
+        switch(mode){
+            case UsimPufHandler.EC_MODE_PRK_R1:
+                key_index = UsimPufHandler.PRK_R1_INDEX;
+                break;
+            case UsimPufHandler.EC_MODE_PRK_K1:
+                key_index = UsimPufHandler.PRK_K1_INDEX;
+                break;
+            default:
+                throw new RuntimeException("");
+        }
+
+        try {
+            byte[] prk = Util.getRandom(32);
+
+            Log.d(LOG_TAG,"prk:"+Util.toHexStr(prk));
+            boolean isok = usimpufhandler.WriteEncMacKey(prk,key_index);
+            byte [] puk = usimpufhandler.GetPuk(mode);
+            Log.d(LOG_TAG,"puk:"+Util.toHexStr(puk));
+
+            result.setText(isok? "OK!!!":"FAIL!!!" );
+        } catch (Exception e) {
+            result.setText("FAIL!!!");
+        }
+//
+//
+//
+        usimpufhandler.G3_CloseChannel();
+
+
+
+    }
 
     public void initPwdSample(TextView result) throws UsimConnectionException {
         usimpufhandler.wait_to_connected();
@@ -493,7 +545,7 @@ public class Test_debug extends AppCompatActivity {
 //
         byte[] respapdu = new byte[0];
         try {
-            respapdu = usimpufhandler.GetPuk();
+            respapdu = usimpufhandler.GetPuk(UsimPufHandler.EC_MODE_PUF);
             result.setText(Util.toHexStr(respapdu));
         } catch (Exception e) {
             result.setText("FAIL!!!");
@@ -506,116 +558,16 @@ public class Test_debug extends AppCompatActivity {
 
     }
 
-    public void signEcdsaSample(TextView result) throws UsimConnectionException {
-        usimpufhandler.wait_to_connected();
-        usimpufhandler.G3_OpenChannel();
-        usimpufhandler.G3_WakeUp();
-
-        String challenge = "c24ba6fd69caee58e5ac423eaf12704e35813f46650b2aa4710f7aa0f182f211";
-
-        byte[] respapdu = new byte[0];
-        try {
-
-            byte[] puk =usimpufhandler.GetPuk();
-            long sttime = System.currentTimeMillis();
-            byte[] sign_value = usimpufhandler.SignEcdsa(challenge);
-
-            long tktime = System.currentTimeMillis()-sttime;
-
-            Log.d(LOG_TAG,String.format("puk: %s",Util.toHexStr(puk)));
-            Log.d(LOG_TAG,String.format("challenge: %s",Util.toHexStr(challenge)));
-            Log.d(LOG_TAG,String.format("sign_value: %s",Util.toHexStr(sign_value)));
-
-
-            result.setText(String.format("sign_value:%s tktime : %.02f",Util.toHexStr(sign_value),(float)tktime));
-
-            //result.setText(Util.toHexStr(sign_value));
-
-        } catch (Exception e) {
-            result.setText("FAIL!!!");
-        }
-
-
-
-//
-//
-//
-        usimpufhandler.G3_CloseChannel();
-
-
-
-    }
-//    public  byte [] getBuffFromAsset(String file_name) throws IOException {
-//
-//        AssetManager am = getResources().getAssets() ;
-//        InputStream is = null ;
-//
-//        String text = "" ;
-//        byte buf[] = null;
-//
-//        try {
-//            //AssetFileDescriptor fd = am.openFd(file_name);
-//            //is = fd.createInputStream();
-//            is = am.open(file_name);
-//            int size = is.available();
-//            //long filesize = fd.getLength();
-//            //long filesize = 1024;
-//            buf = new byte[size] ;
-//            is.read(buf);
-//
-//
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        finally {
-//            if (is != null) is.close() ;
-//        }
-//
-//
-//        return buf;
-//    }
     public void decryptTest(TextView result) throws UsimConnectionException {
 
         usimpufhandler.wait_to_connected();
         usimpufhandler.G3_OpenChannel();
         usimpufhandler.G3_WakeUp();
 
-        byte [] key4encprk	= new byte[0];
-        byte [] iv =Util.toBytes("BE4FF484D791E800B4F604D82A71B81B");
-        try {
-            key4encprk = usimpufhandler.GetKey4EncryptedPrk();
 
-            long sttime = System.currentTimeMillis();
-
-            byte [] benc_client_mnrtu_prk_bin = Util.getBuffFromAsset(getResources(),"enc_client_mnrtu_prk.bin");
-            byte [] bclient_mnrtu_prk = Util.getBuffFromAsset(getResources(),"client_mnrtu_prk.bin");
-            byte [] dec_bclient_mnrtu_prk = Util.decValuePkcs7(key4encprk,benc_client_mnrtu_prk_bin,iv);
+        usimpufhandler.G3_CloseChannel();
 
 
-
-            long tktime = System.currentTimeMillis()-sttime;
-            boolean bcompare = Arrays.equals(bclient_mnrtu_prk, dec_bclient_mnrtu_prk);
-
-            Log.d(LOG_TAG,"bcompare:"+bcompare);
-
-            result.setText(String.format("key4encprk:%s tktime : %.02f bcompare:%s ",Util.toHexStr(key4encprk),(float)tktime,bcompare));
-        } catch (Exception e) {
-            e.printStackTrace();
-            result.setText("FAIL!!!");
-
-        }
-//
-//
-//
-        //byte [] key4encprk	= Util.toBytes("C00D30C205694CF83557F8AC73DB83A5");
-
-
-
-
-
-
-        //usimpufhandler.G3_CloseChannel();
 
     }
 
@@ -723,23 +675,6 @@ public class Test_debug extends AppCompatActivity {
         @Override
         public void onServiceConnected() {
             sample_result.setText("onServiceConnected");
-
-//            if(TextUtils.isEmpty(verify_flag))//verify_flagr가 null 값이면(= 처음 진행하는 경우) change_pw로 이동해서 pw설정하도록
-//            {
-//
-//
-//
-//                //////////
-//
-//
-//
-//
-//
-//
-//                usimpufhandler.G3_CloseChannel();
-//
-//
-//            }
 
         }
         @Override

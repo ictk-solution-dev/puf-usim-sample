@@ -7,12 +7,20 @@ import com.lguplus.usimlib.TsmClient;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import com.lguplus.usimlib.TsmClientConnectListener;
 import com.lguplus.usimlib.TsmUtil;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 public class UsimPufHandler {
 	private static final String LOG_TAG = UsimPufHandler.class.getSimpleName();
@@ -66,10 +74,28 @@ public class UsimPufHandler {
 	public static String RESET ="9F000000";
 	public static String WRITEKEY_KEY0 ="81000001";
 	public static String AES_SIGN_KEY0 ="88010000";
-	public static String ECDSA_SIGN_KEY0 ="86100001";
-	public static String READKEY_4_ENC_PRK ="80140001";
 
-	public static String GET_PUK ="8C100001";
+
+	public static String ECDSA_SIGN_PUF ="86100001";
+	public static String ECDSA_SIGN_K1 ="86080001";
+	public static String ECDSA_SIGN_R1 ="860C0001";
+
+
+	public static String GET_PUK_PUF ="8C100001";
+	public static String GET_PUK_R1 ="8C0C0001";
+	public static String GET_PUK_K1 ="8C080001";
+
+	public static final int EC_MODE_PRK_R1 = 0;
+	public static final int EC_MODE_PRK_K1 = 1;
+	public static final int EC_MODE_PUF = 2;
+
+	public static final int PRK_R1_INDEX = 12;
+	public static final int PRK_K1_INDEX = 8;
+
+	public static final int PRK_PUF_INDEX = 16;
+
+
+	byte [] _rw_session_key = new byte[16];
 
 	public class CrcException extends Exception{
 
@@ -265,7 +291,7 @@ public class UsimPufHandler {
 	}
 
 	public byte [] GetSn() throws Exception{
-		byte[] ret = GetPuk();
+		byte[] ret = GetPuk(EC_MODE_PUF);
 
 		return Arrays.copyOf(Util.sha256(ret),16);
 
@@ -316,10 +342,27 @@ public class UsimPufHandler {
 
 
 	}
-	public byte[]  GetPuk() throws IOException, CrcException {
+	public byte[]  GetPuk(int mode) throws IOException, CrcException {
+		String input = null;
+		switch (mode){
+			case EC_MODE_PRK_R1:
+				input = GET_PUK_R1;
+				break;
+			case EC_MODE_PRK_K1:
+				input = GET_PUK_K1;
+				break;
+			case EC_MODE_PUF:
+				input = GET_PUK_PUF;
+				break;
+		}
 
-		return this.EnterPacket(GET_PUK);
+		return this.EnterPacket(input);
 	}
+
+
+
+
+
 	public byte[]  Reset() throws IOException, CrcException {
 
 		return this.EnterPacket(RESET);
@@ -335,11 +378,11 @@ public class UsimPufHandler {
 		return UpdatePassword(sn);
 
 	}
-	public boolean VerifyAccessValue(Object challenge, Object auth_value, int keyindex ) throws Exception {
+	public boolean VerifyAccessValue(Object challenge, Object sign, int keyindex ) throws Exception {
 
 		byte [] tbs_data = MakeInputAccessValue(challenge,keyindex);
 
-		byte [] result = EnterPacket(Util.joinBytes(String.format("87%02X1023",keyindex),tbs_data,auth_value));
+		byte [] result = EnterPacket(Util.joinBytes(String.format("87%02X1023",keyindex),tbs_data,sign));
 		return Util.toHexStr(result).equals("00");
 
 	}
@@ -361,13 +404,13 @@ public class UsimPufHandler {
 
 		//byte [] new_key = Util.sha256Exp200Left16(pw,system_const);
 		byte [] new_key = DeriveAccessKey(pw);
-		return WriteAuthKey(new_key);
+		return WriteAcKey(new_key);
 
 	}
 
 
 
-	public boolean WriteAuthKey(Object key ) throws IOException, CrcException {
+	public boolean WriteAcKey(Object key ) throws IOException, CrcException {
 
 		//byte [] paddingkey = Util.joinBytes(key,new byte[26]);
 		byte[] recvdata = this.EnterPacket(Util.joinBytes(WRITEKEY_KEY0,key,new byte[16])); //16자리 키를 32 바이트로 zero padding 해준다.
@@ -377,10 +420,23 @@ public class UsimPufHandler {
 		return Util.toHexStr(recvdata).equals("00");
 	}
 
-	public byte [] SignEcdsa(Object tbs_data ) throws IOException, CrcException {
+	public byte [] SignEcdsa(Object tbs_data,int mode ) throws IOException, CrcException {
+
+		String input = null;
+		switch (mode){
+			case EC_MODE_PRK_R1:
+				input = ECDSA_SIGN_R1;
+				break;
+			case EC_MODE_PRK_K1:
+				input = ECDSA_SIGN_K1;
+				break;
+			case EC_MODE_PUF:
+				input = ECDSA_SIGN_PUF;
+				break;
+		}
 
 
-		byte[] recvdata = this.EnterPacket(Util.joinBytes(ECDSA_SIGN_KEY0,tbs_data));
+		byte[] recvdata = this.EnterPacket(Util.joinBytes(input,tbs_data));
 
 		return recvdata;
 
@@ -388,35 +444,75 @@ public class UsimPufHandler {
 		//return recvdata;
 	}
 
-	public byte [] GetKey4EncryptedPrk() throws IOException, CrcException {
-		return Arrays.copyOf(this.EnterPacket(READKEY_4_ENC_PRK),16);
 
-	}
 	static public byte [] MakeInputAccessValue(Object challenge , int keyindex) throws IOException {
 		byte [] tbs_data = Util.joinBytes(String.format("86%02X0003000000000000000000000000",keyindex),challenge);
 		return tbs_data;
 
 	}
+
+
 	static public byte [] DeriveAccessKey(Object pw ) throws Exception {
 
 		byte [] new_key = Util.sha256Exp200Left16(pw,system_const);
 		return new_key;
 
 	}
+	static public byte [] MakeAcSign(Object ac_key,Object challenge , int keyindex) throws IOException, NoSuchPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+		//byte [] iv = Util.toBytes(String.format("86%02X1023000000000000000000000000",keyindex));
 
-
-	private boolean _verifyAccess(Object key, int keyindex ) throws Exception {
-
-		Reset();
-		byte []challenge = GetChallenge();
 		byte [] tbs_data = MakeInputAccessValue(challenge,keyindex);
 
-		byte[] enc_val = Util.encValue(key, tbs_data);
+		byte[] enc_val = Util.aesCbc(Cipher.ENCRYPT_MODE,ac_key,tbs_data,new byte[16]);//Util.encValue(ac_key, tbs_data);
 
 		byte [] sign = Arrays.copyOfRange(enc_val,enc_val.length-16,enc_val.length);
 
-		return VerifyAccessValue(challenge,sign , keyindex);
+		return sign;
 
+	}
+	static public byte [] MakeSessionKey(Object ac_key,Object sign , int keyindex) throws IOException, NoSuchPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+		byte [] iv = Util.toBytes(String.format("87%02X1023000000000000000000000000",keyindex));
+
+		return Util.subBytes(Util.aesCbc(Cipher.ENCRYPT_MODE,ac_key,sign,iv),0,16);
+
+	}
+	public boolean WriteEncMacKey(Object new_key ,int keyindex) throws IOException, CrcException, NoSuchPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+
+		//byte [] paddingkey = Util.joinBytes(key,new byte[26]);
+		byte [] head = Util.toBytes(String.format("81%02X1501",keyindex));
+		byte [] iv = Util.joinBytes(head,new byte[12]);
+
+		Log.d(LOG_TAG,"_rw_session_key : "+Util.toHexStr(_rw_session_key));
+
+		byte [] enc_data = Util.aesCbc(Cipher.ENCRYPT_MODE,_rw_session_key,new_key,iv);
+		byte [] all_mac = Util.aesCbc(Cipher.ENCRYPT_MODE,_rw_session_key,enc_data,iv);
+
+		byte [] mac = Arrays.copyOfRange(all_mac,all_mac.length-16,enc_data.length);
+
+		byte [] packet_input = Util.joinBytes(head,enc_data,iv,mac);
+
+		Log.d(LOG_TAG,"packet_input : "+Util.toHexStr(packet_input));
+
+		byte[] recvdata = this.EnterPacket(packet_input); //16자리 키를 32 바이트로 zero padding 해준다.
+		Log.d(LOG_TAG,"WriteEncMacKey : "+Util.toHexStr(recvdata));
+
+		//byte[] send_data = new byte[input_data.length + 2];
+		return Util.toHexStr(recvdata).equals("00");
+	}
+
+
+
+	private boolean _verifyAccess(Object ac_key, int keyindex ) throws Exception {
+
+		Reset();
+		byte []challenge = GetChallenge();
+
+		byte [] sign = MakeAcSign(ac_key,challenge,keyindex);
+
+
+		_rw_session_key = MakeSessionKey(ac_key,sign,keyindex);
+
+		return VerifyAccessValue(challenge,sign , keyindex);
 	}
 
 
