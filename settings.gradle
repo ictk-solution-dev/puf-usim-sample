@@ -9,3 +9,5 @@ dependencyResolutionManagement {
 
 rootProject.name='PQC2nd sample'
 include ':app'
+include ':myapplication'
+include ':pufusim'

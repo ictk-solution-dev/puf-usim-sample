@@ -19,6 +19,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import com.ictk.pufusim.UsimPufHandler;
+import com.ictk.pufusim.Util;
+import com.ictk.pufusim.UsimConnectionException;
+import com.ictk.pufusim.EcdsaResult;
+
+
 public class TestWallet extends AppCompatActivity {
     private static final String LOG_TAG = TestWallet.class.getSimpleName();
     private TextView sample_result;
@@ -142,11 +148,11 @@ public class TestWallet extends AppCompatActivity {
             String fileContents = "Hello world!";
 
             //File file = new File(this.mContext.getFilesDir(), filename);
-            Log.d(LOG_TAG,String.format("getFilesDir: %s",this.mContext.getFilesDir()));
+     //       Log.d(LOG_TAG,String.format("getFilesDir: %s",this.mContext.getFilesDir()));
 
-            try (FileOutputStream fos = this.mContext.openFileOutput(filename, Context.MODE_PRIVATE)) {
-                fos.write(fileContents.getBytes(StandardCharsets.UTF_8));
-            }
+//            try (FileOutputStream fos = this.mContext.openFileOutput(filename, Context.MODE_PRIVATE)) {
+//                fos.write(fileContents.getBytes(StandardCharsets.UTF_8));
+//            }
 
             //result.setText(Util.toHexStr(sign_value));
 

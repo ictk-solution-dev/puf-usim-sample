@@ -9,13 +9,25 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.Signature;
+import java.security.spec.PKCS8EncodedKeySpec;
+
+import com.ictk.pufusim.EcdsaResult;
+import com.ictk.pufusim.UsimPufHandler;
+import com.ictk.pufusim.Util;
+
 
 public class Test_Select extends AppCompatActivity {
     private static final String LOG_TAG = Test_Select.class.getSimpleName();
@@ -87,6 +99,50 @@ public class Test_Select extends AppCompatActivity {
 
 
         }
+        String getSignFromServer(byte [] challenge) throws JSONException, IOException {
+            URL url = new URL("http://192.168.1.61:8000/pqc3/device/admin/ecc/lib/init-puf"); // 호출할 url
+
+            String jsonInputString = String.format("{\"header\": {\"trId\": \"500800\"}, \"body\": {\"challenge\": \"%s\", \"type\": \"nft\"}}",Util.toHexStr(challenge));
+
+            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+            //conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+            conn.setRequestProperty("Accept", "application/json");
+            //conn.setRequestProperty("Authorization", "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJVU0VSX0lEIjoiZGVidWdBZXMiLCJUT0tFTl9UWVBFIjoiREVCVUdfQUVTX1RPS0VOIiwiZXhwIjoxNjYyNzAwMTM3LCJVU0VSX0xFVkVMIjoiREVCVUdfQUVTX1VTRVIifQ.G9jEoUcRYl_9WrlMhjiZEVjsu1lpo8XoZYQB0WS8_BiQsIzo78kuPzHPdL0S_CcvWV2GFQ9jlCdMaVOU-HRRyA");
+
+            conn.setDoOutput(true);
+            try(OutputStream os = conn.getOutputStream()) {
+                byte[] input = jsonInputString.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+
+            String inputLine;
+            StringBuffer sb = new StringBuffer();
+            while((inputLine = in.readLine()) != null) { // response 출력
+                sb.append(inputLine);
+            }
+
+            in.close();
+
+            Log.d(LOG_TAG,"result:"+sb.toString());
+
+            JSONObject jsonObject = new JSONObject(sb.toString());
+
+            JSONObject body = jsonObject.getJSONObject("body");
+            String sign = body.getString("rawBytes");
+            return sign;
+        }
+        public PrivateKey keyToValue(byte[] pkcs8key)
+                throws GeneralSecurityException {
+
+            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(pkcs8key);
+            KeyFactory factory = KeyFactory.getInstance("ECDSA");
+            PrivateKey privateKey = factory.generatePrivate(spec);
+            return privateKey;
+        }
         @Override
         public void run() {
             try {
@@ -95,51 +151,36 @@ public class Test_Select extends AppCompatActivity {
                 usimpufhandler.G3_OpenChannel();
                 usimpufhandler.G3_WakeUp();
 
+
                 byte []challenge = usimpufhandler.GetChallenge();
 
+                String strsig = getSignFromServer(challenge);
+
+
+
+
+//
+//                Signature signature = Signature.getInstance("SHA256withECDSA", "BC");
+//                signature.initSign(keyToValue(Util.toBytes(der)));
+//
+//                signature.update(challenge);
+//                byte [] sig = signature.sign();
+
                 //byte []challenge =Util.toBytes("6097c93153716ee0b77bd21552aae8c6a818d62833db79f62c787c4b2f790267");
-                URL url = new URL("http://pqc.ictk.com:8095/debug/public/aes/sign"); // 호출할 url
 
-                String jsonInputString = String.format("{\"header\": {\"trId\": \"999001\", \"function\": \"getAesSign\"}, \"body\": {\"challenge\": \"%s\", \"header\": \"\"}}",Util.toHexStr(challenge));
+                result.setText("sign:"+strsig);
 
-                HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-                //conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
-                conn.setRequestProperty("Accept", "application/json");
-                conn.setRequestProperty("Authorization", "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJVU0VSX0lEIjoiZGVidWdBZXMiLCJUT0tFTl9UWVBFIjoiREVCVUdfQUVTX1RPS0VOIiwiZXhwIjoxNjYyNzAwMTM3LCJVU0VSX0xFVkVMIjoiREVCVUdfQUVTX1VTRVIifQ.G9jEoUcRYl_9WrlMhjiZEVjsu1lpo8XoZYQB0WS8_BiQsIzo78kuPzHPdL0S_CcvWV2GFQ9jlCdMaVOU-HRRyA");
 
-                conn.setDoOutput(true);
-                try(OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
-                    os.write(input, 0, input.length);
-                }
+                boolean ret = usimpufhandler.InitPassword(challenge,strsig);
 
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
 
-                String inputLine;
-                StringBuffer sb = new StringBuffer();
-                while((inputLine = in.readLine()) != null) { // response 출력
-                    sb.append(inputLine);
-                }
+                //boolean ret = usimpufhandler.VerifyAccessValue(challenge,sign,1);
 
-                in.close();
+                Log.d(LOG_TAG,"InitPassword result"+ret);
 
-                Log.d(LOG_TAG,"result:"+sb.toString());
+                //byte[] init_pw = usimpufhandler.GetSn();//초기 pw 는 sn 이다.
 
-                JSONObject jsonObject = new JSONObject(sb.toString());
-
-                JSONObject body = jsonObject.getJSONObject("body");
-                String sign = body.getString("sign");
-                result.setText("sign:"+sign);
-
-                boolean ret = usimpufhandler.VerifyAccessValue(challenge,sign,1);
-
-                Log.d(LOG_TAG,"VerifyAccessValue result"+ret);
-
-                byte[] init_pw = usimpufhandler.GetSn();//초기 pw 는 sn 이다.
-
-                ret = usimpufhandler.UpdatePassword(init_pw);
+                //ret = usimpufhandler.UpdatePassword(init_pw);
 
                 result.setText(ret ? "UPDATE SUCCESS":"UPDATE FAIL");
 

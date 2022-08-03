@@ -20,6 +20,10 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
+import com.ictk.pufusim.UsimPufHandler;
+import com.ictk.pufusim.Util;
+import com.ictk.pufusim.UsimConnectionException;
+
 
 //import static com.ictkholdings.pqc2nd_sample.App.mClient;
 
