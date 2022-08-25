@@ -160,17 +160,7 @@ public class TestWallet extends AppCompatActivity {
 
                         sample_result.setText(restext);
 
-                        String filename = "/data/myfile.txt";
-                        String fileContents = "Hello world!";
 
-                        //File file = new File(this.mContext.getFilesDir(), filename);
-                        //       Log.d(LOG_TAG,String.format("getFilesDir: %s",this.mContext.getFilesDir()));
-
-//            try (FileOutputStream fos = this.mContext.openFileOutput(filename, Context.MODE_PRIVATE)) {
-//                fos.write(fileContents.getBytes(StandardCharsets.UTF_8));
-//            }
-
-                        //result.setText(Util.toHexStr(sign_value));
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -192,38 +182,13 @@ public class TestWallet extends AppCompatActivity {
                 try {
 
                     byte[] prk = Util.toBytes("7170c5103ead7da65adb4f568b3c66417b22716bf4d577540726ed719869d86f");
-                    ECPrivateKey privateKey = CryptoUtil.toECPrivateKey(prk);
-                    ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec("secp256r1");
-                    ECPoint G = ecSpec.getG();
-
-                    ECPoint addval = G.add(G);
-                    Log.d(LOG_TAG,String.format("Q:%s %s",addval.getXCoord().toBigInteger(),addval.getRawXCoord().toBigInteger()));
-
-                    for(int i =1 ; i <100;i++){
-
-                        ECPoint Q = G.multiply(BigInteger.valueOf(i));
-                        //Log.d(LOG_TAG,String.format("i:%d",i));
-                        //Log.d(LOG_TAG,String.format("Q X:%s Y:%s",Q.getXCoord().toBigInteger(),Q.getYCoord().toBigInteger()));
-                        Log.d(LOG_TAG,String.format("i:%d Q:%s %s",i,Q.getXCoord().toBigInteger(),Q.getRawXCoord().toBigInteger()));
-                        Log.d(LOG_TAG,"\n");
-
-                    }
-
-
-
-                    //byte [] puk = CryptoUtil.toRawBytesFromECPointBC(Q);
                     byte [] puk = Util.toBytes("0983d9649032fc561a46ed0732dd7a5b52b75ae2cd4a70c7af85ee1a7973ef60619937d1b4d3f73fbb3c87d11bcea170f782d8728477e76d026a9a20dbd646d9");
                     Log.d(LOG_TAG,String.format("prk: %s",Util.toHexStr(prk)));
-                    Log.d(LOG_TAG,String.format("prk int: %s",privateKey.getS()));
                     Log.d(LOG_TAG,String.format("prk int 2: %s",new BigInteger(prk)));
-
-                    Log.d(LOG_TAG,String.format("G: X:%s Y:%s",G.getXCoord().toBigInteger(),G.getYCoord().toBigInteger()));
 
                     Log.d(LOG_TAG,String.format("puk: %s",Util.toHexStr(puk)));
 
-                    KeyPair keypair = new KeyPair(CryptoUtil.toECPublicKey(puk),
-                            privateKey);
-
+                    String csr_pem = CryptoUtil.generateCSR(prk, puk, "CCTK TEST CSR");
 
                     Log.d(LOG_TAG,String.format("csr_pem: %s",csr_pem));
 
