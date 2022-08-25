@@ -176,43 +176,44 @@ public class TestWallet extends AppCompatActivity {
             }
         });
 
-        ((Button) findViewById(R.id.gen_csr_button)).setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-
-                    byte[] prk = Util.toBytes("7170c5103ead7da65adb4f568b3c66417b22716bf4d577540726ed719869d86f");
-                    byte [] puk = Util.toBytes("0983d9649032fc561a46ed0732dd7a5b52b75ae2cd4a70c7af85ee1a7973ef60619937d1b4d3f73fbb3c87d11bcea170f782d8728477e76d026a9a20dbd646d9");
-                    Log.d(LOG_TAG,String.format("prk: %s",Util.toHexStr(prk)));
-                    Log.d(LOG_TAG,String.format("prk int 2: %s",new BigInteger(prk)));
-
-                    Log.d(LOG_TAG,String.format("puk: %s",Util.toHexStr(puk)));
-
-                    String csr_pem = CryptoUtil.generateCSR(prk, puk, "CCTK TEST CSR");
-
-                    Log.d(LOG_TAG,String.format("csr_pem: %s",csr_pem));
-
-                    String restext = String.format
-                            ("prk:\n%s\n\npuk:\n%s\n\ncsr_pem:\n%s\n\n",
-                                    Util.toHexStr(prk),
-                                    Util.toHexStr(puk),
-                                    csr_pem
-                            );
-
-
-                    sample_result.setText(restext);
-
-
-
-
-                } catch (Exception e) {
-                    sample_result.setText("FAIL!!!");
-                    e.printStackTrace();
-                }
-
-
-            }
-        });
+//        ((Button) findViewById(R.id.gen_csr_button)).setOnClickListener(new Button.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                try {
+//
+//                    byte[] prk = Util.toBytes("7170c5103ead7da65adb4f568b3c66417b22716bf4d577540726ed719869d86f");
+//                    byte [] puk = Util.toBytes("0983d9649032fc561a46ed0732dd7a5b52b75ae2cd4a70c7af85ee1a7973ef60619937d1b4d3f73fbb3c87d11bcea170f782d8728477e76d026a9a20dbd646d9");
+//                    Log.d(LOG_TAG,String.format("prk: %s",Util.toHexStr(prk)));
+//                    Log.d(LOG_TAG,String.format("prk int 2: %s",new BigInteger(prk)));
+//
+//                    Log.d(LOG_TAG,"prk:"+Util.toHexStr(prk));
+//                    Log.d(LOG_TAG,"puk:"+Util.toHexStr(puk));
+//
+//                    String csr_pem = CryptoUtil.generateCSR(prk, puk, "CCTK TEST CSR");
+//
+//                    Log.d(LOG_TAG,String.format("csr_pem: %s",csr_pem));
+//
+//                    String restext = String.format
+//                            ("prk:\n%s\n\npuk:\n%s\n\ncsr_pem:\n%s\n\n",
+//                                    Util.toHexStr(prk),
+//                                    Util.toHexStr(puk),
+//                                    csr_pem
+//                            );
+//
+//
+//                    sample_result.setText(restext);
+//
+//
+//
+//
+//                } catch (Exception e) {
+//                    sample_result.setText("FAIL!!!");
+//                    e.printStackTrace();
+//                }
+//
+//
+//            }
+//        });
     }
 
 

@@ -44,12 +44,12 @@
             android:layout_gravity="center_horizontal"
             android:text="MAKE ADDRESs" />
 
-        <Button
-            android:id="@+id/gen_csr_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="GEN CSR" />
+<!--        <Button-->
+<!--            android:id="@+id/gen_csr_button"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="center_horizontal"-->
+<!--            android:text="GEN CSR" />-->
 
 
         <TextView

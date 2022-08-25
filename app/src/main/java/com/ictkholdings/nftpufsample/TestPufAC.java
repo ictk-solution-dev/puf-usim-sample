@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.ictk.pufusim.CryptoUtil;
 import com.lguplus.usimlib.*;
 
 import org.json.JSONObject;
@@ -445,6 +446,7 @@ public class TestPufAC extends AppCompatActivity {
         usimpufhandler.G3_OpenChannel();
         usimpufhandler.G3_WakeUp();
         int key_index =0;
+        String csr_pem ="NOT R1 KEY";
         switch(mode){
             case UsimPufHandler.EC_MODE_PRK_R1:
                 key_index = UsimPufHandler.PRK_R1_INDEX;
@@ -459,12 +461,36 @@ public class TestPufAC extends AppCompatActivity {
         try {
             byte[] prk = Util.getRandom(32);
 
-            Log.d(LOG_TAG,"prk:"+Util.toHexStr(prk));
-            boolean isok = usimpufhandler.WriteEncMacKey(prk,key_index);
-            byte [] puk = usimpufhandler.GetPuk(mode);
-            Log.d(LOG_TAG,"puk:"+Util.toHexStr(puk));
 
-            result.setText(isok? "OK!!!":"FAIL!!!" );
+            boolean isok = usimpufhandler.WriteEncMacKey(prk,key_index);
+            if(!isok){
+                throw new Exception("WRITE ERROR");
+            }
+            byte [] puk = usimpufhandler.GetPuk(mode);
+
+            Log.d(LOG_TAG,"prk:"+Util.toHexStr(prk));
+            Log.d(LOG_TAG,"puk:"+Util.toHexStr(puk));
+            Log.d(LOG_TAG,"isok:"+isok);
+
+            if(mode==UsimPufHandler.EC_MODE_PRK_R1)
+
+            csr_pem = CryptoUtil.generateCSR(prk, puk, "CCTK TEST CSR");
+
+
+
+            String restext = String.format
+                    ("OK!!\n\nprk:\n%s\n\npuk:\n%s\n\ncsr_pem:\n%s\n\n",
+                            Util.toHexStr(prk),
+                            Util.toHexStr(puk),
+                            csr_pem
+                    );
+
+
+            sample_result.setText(restext);
+
+            Log.d(LOG_TAG,"csr_pem:"+csr_pem);
+
+           // result.setText(isok? "OK!!!":"FAIL!!!" );
         } catch (Exception e) {
             result.setText("FAIL!!!");
         }
