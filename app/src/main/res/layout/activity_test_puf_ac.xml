@@ -60,12 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="UPDATE INIT PWD" />
-        <Button
-            android:id="@+id/verify_pwd_by_secure_sample_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="VERIFY PWD BY SECURE STORE" />
+
         <Button
             android:id="@+id/write_r1_key_sample_button"
             android:layout_width="match_parent"
@@ -79,6 +74,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="WRITE K1 KEY" />
+
+
         <TextView
             android:id="@+id/sample_result"
             android:layout_width="match_parent"

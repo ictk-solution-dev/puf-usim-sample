@@ -7,7 +7,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name='PQC2nd sample'
+rootProject.name='ICTK NFT PUF sample'
 include ':app'
 include ':myapplication'
 include ':pufusim'

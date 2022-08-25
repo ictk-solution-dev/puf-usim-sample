@@ -129,20 +129,7 @@ public class TestPufAC extends AppCompatActivity {
                 });
 
 
-        ((Button) findViewById(R.id.verify_pwd_by_secure_sample_button))
-                .setOnClickListener(new Button.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        try {
-                            verifyPwdScureStoreSample(sample_result);
-                        } catch (UsimConnectionException e) {
-                            sample_result.setText(e.toString());
-                            e.printStackTrace();
-                        }
 
-
-                    }
-                });
 
         ((Button) findViewById(R.id.write_r1_key_sample_button))
                 .setOnClickListener(new Button.OnClickListener() {
