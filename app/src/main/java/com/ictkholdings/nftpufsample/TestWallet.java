@@ -235,6 +235,7 @@ public class TestWallet extends AppCompatActivity {
 
 
             sign_der_value = EcdsaResult.FromRAWBYTES(sign_value).toDER();
+            String sign_der_b64_value = EcdsaResult.FromRAWBYTES(sign_value).toDERB64();
 
 
             long tktime = System.currentTimeMillis()-sttime;
@@ -242,28 +243,22 @@ public class TestWallet extends AppCompatActivity {
             Log.d(LOG_TAG,String.format("puk: %s",Util.toHexStr(puk)));
             Log.d(LOG_TAG,String.format("challenge: %s",Util.toHexStr(challenge)));
             Log.d(LOG_TAG,String.format("sign_value: %s",Util.toHexStr(sign_value)));
-            String restext = String.format("challenge:\n%s\n\npuk:\n%s\n\nsign_value:\n%s\n\nsign_der_value:\n%s\n\ntktime : %.02f",
+            String restext = String.format("challenge:\n%s\n\n" +
+                            "puk:\n%s\n\n" +
+                            "sign_value:\n%s\n\n" +
+                            "sign_der_value:\n%s\n\n" +
+                            "sign_der_b64_value:\n%s\n\ntktime : %.02f",
                     challenge,
                     Util.toHexStr(puk),
                     Util.toHexStr(sign_value),
                     Util.toHexStr(sign_der_value),
+                    sign_der_b64_value,
 
                     (float)tktime);
 
 
             result.setText(restext);
 
-            String filename = "/data/myfile.txt";
-            String fileContents = "Hello world!";
-
-            //File file = new File(this.mContext.getFilesDir(), filename);
-     //       Log.d(LOG_TAG,String.format("getFilesDir: %s",this.mContext.getFilesDir()));
-
-//            try (FileOutputStream fos = this.mContext.openFileOutput(filename, Context.MODE_PRIVATE)) {
-//                fos.write(fileContents.getBytes(StandardCharsets.UTF_8));
-//            }
-
-            //result.setText(Util.toHexStr(sign_value));
 
         } catch (Exception e) {
             result.setText("FAIL!!!");
