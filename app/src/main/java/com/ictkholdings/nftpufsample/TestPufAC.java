@@ -474,12 +474,11 @@ public class TestPufAC extends AppCompatActivity {
 
             if(mode==UsimPufHandler.EC_MODE_PRK_R1)
 
-            csr_pem = CryptoUtil.generateCSR(prk, puk, "CCTK TEST CSR");
+            csr_pem = CryptoUtil.generateCSR(prk, puk, "CCTK TEST CSR","ccmedia");
 
 
 
-            String restext = String.format
-                    ("OK!!\n\nprk:\n%s\n\npuk:\n%s\n\ncsr_pem:\n%s\n\n",
+            String restext = String.format("OK!!\n\nprk:\n%s\n\npuk:\n%s\n\ncsr_pem:\n%s\n\n",
                             Util.toHexStr(prk),
                             Util.toHexStr(puk),
                             csr_pem
