@@ -223,16 +223,21 @@ public class TestWallet extends AppCompatActivity {
         usimpufhandler.G3_WakeUp();
 
         String challenge = "c24ba6fd69caee58e5ac423eaf12704e35813f46650b2aa4710f7aa0f182f211";
+        String hash_val = "F94F806C7FCE633A08FC6CED0EC2A48D183468313047BEC1C08E86DF7725AA30";
 
         byte[] respapdu = new byte[0];
         byte[] sign_value = new byte[0];
+        byte[] sign_value2 = new byte[0];
         byte[] sign_der_value = new byte[0];
         try {
 
 
             long sttime = System.currentTimeMillis();
             byte[] puk =usimpufhandler.GetPuk(mode);
-            sign_value = usimpufhandler.SignEcdsa(challenge,mode);
+            sign_value = usimpufhandler.SignEcdsa(challenge,mode,false);
+
+            sign_value2 = usimpufhandler.SignEcdsa(hash_val,mode,true);
+
 
 
             sign_der_value = EcdsaResult.FromRAWBYTES(sign_value).toDER();
@@ -244,14 +249,17 @@ public class TestWallet extends AppCompatActivity {
             Log.d(LOG_TAG,String.format("puk: %s",Util.toHexStr(puk)));
             Log.d(LOG_TAG,String.format("challenge: %s",Util.toHexStr(challenge)));
             Log.d(LOG_TAG,String.format("sign_value: %s",Util.toHexStr(sign_value)));
+            Log.d(LOG_TAG,String.format("sign_value2: %s",Util.toHexStr(sign_value2)));
             String restext = String.format("challenge:\n%s\n\n" +
                             "puk:\n%s\n\n" +
                             "sign_value:\n%s\n\n" +
+                            "sign_value2:\n%s\n\n" +
                             "sign_der_value:\n%s\n\n" +
                             "sign_der_b64_value:\n%s\n\ntktime : %.02f",
                     challenge,
                     Util.toHexStr(puk),
                     Util.toHexStr(sign_value),
+                    Util.toHexStr(sign_value2),
                     Util.toHexStr(sign_der_value),
                     sign_der_b64_value,
 

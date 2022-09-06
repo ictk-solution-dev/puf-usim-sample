@@ -474,7 +474,7 @@ public class TestPufAC extends AppCompatActivity {
 
             if(mode==UsimPufHandler.EC_MODE_PRK_R1)
 
-            csr_pem = CryptoUtil.generateCSR(prk, puk, "CCTK TEST CSR","ccmedia");
+            csr_pem = CryptoUtil.generateCSR(prk, puk, "coldwallet1","1234");
 
 
 
