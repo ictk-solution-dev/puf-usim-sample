@@ -1,5 +1,7 @@
 package com.ictkholdings.nftpufsample;
 
+import static com.ictk.pufusim.UsimPufHandler.EC_MODE_PRK_R1;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -95,7 +97,7 @@ public class TestWallet extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
-                    signEcdsaSample(sample_result,UsimPufHandler.EC_MODE_PRK_R1);
+                    signEcdsaSample(sample_result, EC_MODE_PRK_R1);
                 } catch (UsimConnectionException e) {
                     e.printStackTrace();
                 }
@@ -136,7 +138,7 @@ public class TestWallet extends AppCompatActivity {
                         long sttime = System.currentTimeMillis();
 
                         byte[] puksample = Util.toBytes("af7992f73dda9ffa1e8e5e6ba6f75883e87675c162c93f17c8b0b28ddb144acf1905147f157dcd1c63b4fe6c75a59a83e26534aa89a69d2c7bcb0d7631edef13");
-                        byte[] puk =usimpufhandler.GetPuk(UsimPufHandler.EC_MODE_PRK_R1);
+                        byte[] puk =usimpufhandler.GetPuk(EC_MODE_PRK_R1);
 
 
                         Log.d(LOG_TAG,String.format("puk: %s",Util.toHexStr(puk)));
@@ -228,15 +230,23 @@ public class TestWallet extends AppCompatActivity {
         byte[] respapdu = new byte[0];
         byte[] sign_value = new byte[0];
         byte[] sign_value2 = new byte[0];
+        byte[] sign_value_org = new byte[0];
+        byte[] sign_value2_org = new byte[0];
         byte[] sign_der_value = new byte[0];
+
         try {
 
 
             long sttime = System.currentTimeMillis();
             byte[] puk =usimpufhandler.GetPuk(mode);
-            sign_value = usimpufhandler.SignEcdsa(challenge,mode,false);
+            sign_value_org = sign_value = usimpufhandler.SignEcdsa(challenge,mode,false);
 
-            sign_value2 = usimpufhandler.SignEcdsa(hash_val,mode,true);
+            sign_value2_org = sign_value2 = usimpufhandler.SignEcdsa(hash_val,mode,true);
+
+
+
+            sign_value = EcdsaResult.FromRAWBYTES(sign_value).ConvPrevMalle(mode == EC_MODE_PRK_R1).toRAWBYTES();
+            sign_value2 = EcdsaResult.FromRAWBYTES(sign_value2).ConvPrevMalle(mode == EC_MODE_PRK_R1).toRAWBYTES();
 
 
 
@@ -244,12 +254,22 @@ public class TestWallet extends AppCompatActivity {
             String sign_der_b64_value = EcdsaResult.FromRAWBYTES(sign_value).toDERB64();
 
 
+
+
             long tktime = System.currentTimeMillis()-sttime;
 
             Log.d(LOG_TAG,String.format("puk: %s",Util.toHexStr(puk)));
             Log.d(LOG_TAG,String.format("challenge: %s",Util.toHexStr(challenge)));
+
+            Log.d(LOG_TAG,String.format("sign_value_org: %s",Util.toHexStr(sign_value_org)));
             Log.d(LOG_TAG,String.format("sign_value: %s",Util.toHexStr(sign_value)));
+            Log.d(LOG_TAG,String.format("sign_value comp: %s", Util.toHexStr(sign_value_org).compareTo(Util.toHexStr(sign_value)) ));
+
+
+            Log.d(LOG_TAG,String.format("sign_value2_org: %s",Util.toHexStr(sign_value2_org)));
             Log.d(LOG_TAG,String.format("sign_value2: %s",Util.toHexStr(sign_value2)));
+
+
             String restext = String.format("challenge:\n%s\n\n" +
                             "puk:\n%s\n\n" +
                             "sign_value:\n%s\n\n" +
