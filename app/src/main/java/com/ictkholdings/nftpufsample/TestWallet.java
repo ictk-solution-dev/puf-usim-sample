@@ -22,8 +22,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.MessageDigest;
+import java.security.Security;
 import java.security.interfaces.ECPrivateKey;
 import java.util.Locale;
 
@@ -60,6 +62,10 @@ public class TestWallet extends AppCompatActivity {
                         byte[] sig = Util.getRandom(64);
 
                         try {
+
+                            Security.removeProvider("BC");
+
+                            CryptoUtil.KeyGenerate();
                             EcdsaResult inst = EcdsaResult.FromRAWBYTES(sig);
 
                             String str_res = String.format("64bytes:\n%s\n\n\nDER:\n%s\n\n\nR:\n%d\nS:\n%s\n",Util.toHexStr(sig),Util.toHexStr(inst.toDER()),inst.getR(),inst.getS());
@@ -67,7 +73,7 @@ public class TestWallet extends AppCompatActivity {
 
 
                             sample_result.setText(str_res);
-                        } catch (IOException e) {
+                        } catch (IOException | GeneralSecurityException e) {
                             e.printStackTrace();
                         }
 

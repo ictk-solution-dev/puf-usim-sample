@@ -211,16 +211,6 @@ public class Test_Select extends AppCompatActivity {
 
 
 
-
-//
-//                Signature signature = Signature.getInstance("SHA256withECDSA", "BC");
-//                signature.initSign(keyToValue(Util.toBytes(der)));
-//
-//                signature.update(challenge);
-//                byte [] sig = signature.sign();
-
-                //byte []challenge =Util.toBytes("6097c93153716ee0b77bd21552aae8c6a818d62833db79f62c787c4b2f790267");
-
                 result.setText("sign:"+strsig);
 
 
