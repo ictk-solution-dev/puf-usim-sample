@@ -2,9 +2,12 @@ package com.ictkholdings.nftpufsample;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.service.autofill.RegexValidator;
+import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -32,6 +35,7 @@ public class TestPufAC extends AppCompatActivity {
     private static final String LOG_TAG = TestPufAC.class.getSimpleName();
 
     private TextView sample_result;
+    private EditText input_snd_data;
 
     String new_password ="ictk_test";
 
@@ -48,6 +52,7 @@ public class TestPufAC extends AppCompatActivity {
 
 
         sample_result = findViewById(R.id.sample_result);;
+        input_snd_data = findViewById(R.id.input_snd_data);;
 
 
 
@@ -132,28 +137,12 @@ public class TestPufAC extends AppCompatActivity {
 
 
 
-        ((Button) findViewById(R.id.write_r1_key_sample_button))
+        ((Button) findViewById(R.id.input_snd_data_sample_button))
                 .setOnClickListener(new Button.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         try {
-
-                            writeKeySample(sample_result,UsimPufHandler.EC_MODE_PRK_R1);
-                            //verifyPwdScureStoreSample(sample_result);
-                        } catch (UsimConnectionException e) {
-                            sample_result.setText(e.toString());
-                            e.printStackTrace();
-                        }
-
-
-                    }
-                });
-        ((Button) findViewById(R.id.write_k1_key_sample_button))
-                .setOnClickListener(new Button.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        try {
-                            writeKeySample(sample_result,UsimPufHandler.EC_MODE_PRK_K1);
+                            inputSample(sample_result);
                         } catch (UsimConnectionException e) {
                             sample_result.setText(e.toString());
                             e.printStackTrace();
@@ -441,57 +430,42 @@ public class TestPufAC extends AppCompatActivity {
         }
         usimpufhandler.G3_CloseChannel();
     }
-    public void writeKeySample(TextView result,int mode) throws UsimConnectionException {
+    public void inputSample(TextView result) throws UsimConnectionException {
         usimpufhandler.wait_to_connected();
         usimpufhandler.G3_OpenChannel();
         usimpufhandler.G3_WakeUp();
         int key_index =0;
-        String csr_pem ="NOT R1 KEY";
-        switch(mode){
-            case UsimPufHandler.EC_MODE_PRK_R1:
-                key_index = UsimPufHandler.PRK_R1_INDEX;
-                break;
-            case UsimPufHandler.EC_MODE_PRK_K1:
-                key_index = UsimPufHandler.PRK_K1_INDEX;
-                break;
-            default:
-                throw new RuntimeException("");
-        }
+
+
+
 
         try {
             byte[] prk = Util.getRandom(32);
 
+            String str_input = input_snd_data.getText().toString();
 
-            boolean isok = usimpufhandler.WriteEncMacKey(prk,key_index);
-            if(!isok){
-                throw new Exception("WRITE ERROR");
+            if(str_input.length()%2 !=0 || !str_input.matches("[A-Fa-f0-9]+")){
+                throw new RuntimeException("NO HEX STR");
             }
-            byte [] puk = usimpufhandler.GetPuk(mode);
 
-            Log.d(LOG_TAG,"prk:"+Util.toHexStr(prk));
-            Log.d(LOG_TAG,"puk:"+Util.toHexStr(puk));
-            Log.d(LOG_TAG,"isok:"+isok);
+            byte [] binput = Util.toBytes(str_input);
 
-            if(mode==UsimPufHandler.EC_MODE_PRK_R1)
+            byte []res = usimpufhandler.EnterPacket(binput);
+            //byte []res = usimpufhandler.EnterPacket(str_input); //hex str 입력도 가능
 
-            csr_pem = CryptoUtil.generateCSR(prk, puk, "coldwallet1","1234");
-
-
-
-            String restext = String.format("OK!!\n\nprk:\n%s\n\npuk:\n%s\n\ncsr_pem:\n%s\n\n",
-                            Util.toHexStr(prk),
-                            Util.toHexStr(puk),
-                            csr_pem
-                    );
+            String restext = String.format("OK!!\n\nINPUT:%s(%d)\n\nOUTPUT:%s(%d)\n\n",
+                    Util.toHexStr(binput),binput.length,
+                    Util.toHexStr(res),res.length);
 
 
             sample_result.setText(restext);
 
-            Log.d(LOG_TAG,"csr_pem:"+csr_pem);
+            Log.d(LOG_TAG,"str_input.toString():"+str_input.toString());
 
            // result.setText(isok? "OK!!!":"FAIL!!!" );
         } catch (Exception e) {
-            result.setText("FAIL!!!");
+            result.setText("FAIL!!!"+e.toString());
+
         }
 //
 //

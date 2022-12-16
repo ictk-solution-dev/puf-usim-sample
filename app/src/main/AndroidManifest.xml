@@ -25,12 +25,6 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".TestWallet"
-            android:exported="true" />
-        <activity
-            android:name=".Test_Select"
-            android:exported="true" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
 		}
 		//showSetting();
-		Intent intent = new Intent(getApplicationContext(), Test_Select.class);//neo1seok test
+		Intent intent = new Intent(getApplicationContext(), TestPufAC.class);//neo1seok test
 		startActivity(intent);
 
 

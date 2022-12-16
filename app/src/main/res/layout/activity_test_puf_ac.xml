@@ -19,6 +19,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+        <EditText
+            android:id="@+id/input_snd_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="80000000" />
+
+        <Button
+            android:id="@+id/input_snd_data_sample_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="INPUT TO PUF" />
+
         <Button
             android:id="@+id/base_sample_button"
             android:layout_width="match_parent"
@@ -42,6 +57,18 @@
             android:layout_gravity="center_horizontal"
             android:text="VERIFY PWD" />
 
+
+        <Button
+            android:id="@+id/init_pw_sample_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="UPDATE INIT PWD" />
+
+
+
+
+
         <Button
             android:id="@+id/update_pwd_sample_button"
             android:layout_width="match_parent"
@@ -54,27 +81,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="VERIFY NEW PWD" />
-        <Button
-            android:id="@+id/init_pw_sample_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="UPDATE INIT PWD" />
-
-        <Button
-            android:id="@+id/write_r1_key_sample_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="WRITE R1 KEY" />
-
-        <Button
-            android:id="@+id/write_k1_key_sample_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="WRITE K1 KEY" />
-
 
         <TextView
             android:id="@+id/sample_result"
