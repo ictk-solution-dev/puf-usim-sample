@@ -253,119 +253,6 @@ public class TestPufAC extends AppCompatActivity {
     }
 
 
-//    public void verifyPwdKe1Sample(TextView result)
-//    {
-//        usimpufhandler.wait_to_connected();
-//        usimpufhandler.G3_OpenChannel();
-//        usimpufhandler.G3_WakeUp();
-// /*
-//    S_TEST_LNI_0_SIDX_0_RPI_0	PASS	reset	RESET	0	0000H		00
-//S_TEST_LNI_1_SIDX_0_RPI_0	PASS	GET CHALENGE 	GET_CHAL	32	0000H		639634A1032AF19AB16A2DE8ECDF06967C39E06A200E59B7F2E8ED90130377F6
-//S_TEST_LNI_2_SIDX_0_RPI_0	PASS	GET KEY 1 AC	VERIFY	1	1023H	86010003000000000000000000000000639634A1032AF19AB16A2DE8ECDF06967C39E06A200E59B7F2E8ED90130377F6586E2EB7A030B89B186253F03A55109E	00
-//S_TEST_LNI_3_SIDX_0_RPI_0	PASS	reset	RESET	0	0000H		00
-//S_TEST_LNI_4_SIDX_0_RPI_0	NO_CHCEK	GET SN	GET_PUB_KEY	16	0001H		0322E080042C61F8E09CD0F9F482B49DB22AB9AC93CF42EC5A7CD72D73825A7C63FAFC76630A4216CD8F9FEE2B9B8D9340282175CBC0340820E765AB7641F17F
-//S_TEST_LNI_5_SIDX_0_RPI_0	PASS	GET CHALENGE 	GET_CHAL	32	0000H		60C736E765082D98100D460747823751EA901B6E34D2597F7240AA657FB5CD28
-//S_TEST_LNI_6_SIDX_0_RPI_0	PASS	GET KEY 0 AC	VERIFY	0	1023H	8600000300000000000000000000000060C736E765082D98100D460747823751EA901B6E34D2597F7240AA657FB5CD28563FF32470FFBA6080505CCAA027AE0C	00
-//
-//    * */
-//        byte[] respapdu = new byte[0];
-//        try {
-//            respapdu = usimpufhandler.EnterPacket("8200000003ac674216f3e15c761ee1a5e255f067");
-//
-//
-//            byte []challenge = usimpufhandler.GetChallenge();
-//
-//            Log.d(LOG_TAG,String.format("challenge key 0 : %s",Util.toHexStr(challenge)));
-//
-//            String aes_key = "0B0CF1D734DE39C34DC827F4DCDE6624";
-//            String iv =  "86010003000000000000000000000000";
-//            String org_data = iv+Util.toHexStr(challenge);
-//            String msg = "1C10D282025D5E8D91D1EBB264706DF364810010C4313124CD077CECCF437F7D";
-//            byte[] enc_val = Util.encValue(aes_key, org_data);
-//
-//            byte [] sign = Arrays.copyOfRange(enc_val,enc_val.length-16,enc_val.length);
-//            Log.d(LOG_TAG,String.format("enc_val  : %s",Util.toHexStr(enc_val)));
-//            Log.d(LOG_TAG,String.format("sign  : %s",Util.toHexStr(sign)));
-//
-//
-//
-//            respapdu = usimpufhandler.EnterPacket("87011023"+org_data+Util.toHexStr(sign));
-//
-//
-//
-//
-//            result.setText(Util.toHexStr(respapdu));
-//        } catch (Exception e) {
-//            result.setText("FAIL!!!:"+e.getMessage());
-//        }
-//        usimpufhandler.G3_CloseChannel();
-//
-//
-//
-//    }
-    public void verifyPwdScureStoreSample(TextView result) throws UsimConnectionException {
-        usimpufhandler.wait_to_connected();
-        usimpufhandler.G3_OpenChannel();
-        usimpufhandler.G3_WakeUp();
-        byte[] respapdu = new byte[0];
-        try {
-            byte[] init_pw = usimpufhandler.GetSn();//초기 pw 는 sn 이다.
-            boolean ret = usimpufhandler.VerifyPassword(init_pw);
-            //최초 실행시 시리얼 값으로 verify를 해서 access 를 얻는다.
-
-            byte []  new_password ="1234".getBytes();
-            //사용자에게 4자리 핀번호를 입력 받는다.
-
-            usimpufhandler.UpdatePassword(new_password);
-            //사용자에게 받은 pw 를 puf에 저장 한다.
-
-            byte []  new_key = usimpufhandler.DeriveAccessKey(new_password);
-            //사용자에게 받은 pw 로 puf내 저장된 키 형태로 secure store 에 저장 한다.
-
-
-            byte []challenge = usimpufhandler.GetChallenge();
-            //challenge 값을 얻는다.
-
-
-            /*######################################################################*/
-            // 이 과정은 시큐어 스토어에서 키를 저장후 연산하는 과정을 가상으로 구현한 것이다.
-
-
-            // pw 를 통해 실제 puf안에 저장된 키를 유도 한다.
-            // 지문 인증을 통해 허가를 얻은 SecureStore에 저장한다고 가정한다.
-
-
-            byte [] input_access_value = usimpufhandler.MakeInputAccessValue(challenge,0);
-
-            byte [] enc_data = Util.encValue(new_key,input_access_value);
-            // 실제로 secure store에서 계산 한다고 가정 한다. ( no padding)
-
-            byte [] sign = Arrays.copyOfRange(enc_data,enc_data.length-16,enc_data.length);
-            //암호화 된 데이타의 뒤에 16바이트를 서명값으로 취한다.
-            /*######################################################################*/
-
-
-            //0을 넣어 준다.
-            //서명 대상 파일을 만든다.
-
-            ret = usimpufhandler.VerifyAccessValue(challenge,sign,0);
-
-
-
-
-            result.setText(ret ? "VERIFY SUCCESS":"VERIFY FAIL");
-
-            usimpufhandler.UpdatePassword(init_pw);
-
-
-        } catch (Exception e) {
-            result.setText("FAIL!!!:"+e.getMessage());
-        }
-        usimpufhandler.G3_CloseChannel();
-
-
-
-    }
     public void verifyPwdSample(TextView result) throws UsimConnectionException {
         usimpufhandler.wait_to_connected();
         usimpufhandler.G3_OpenChannel();
@@ -434,15 +321,13 @@ public class TestPufAC extends AppCompatActivity {
         usimpufhandler.wait_to_connected();
         usimpufhandler.G3_OpenChannel();
         usimpufhandler.G3_WakeUp();
-        int key_index =0;
-
-
+        //usimpufhandler 에서 시작시 반드시 호출 해준다.
 
 
         try {
-            byte[] prk = Util.getRandom(32);
 
             String str_input = input_snd_data.getText().toString();
+            //input 값에서 hex string 값을 가져온다.
 
             if(str_input.length()%2 !=0 || !str_input.matches("[A-Fa-f0-9]+")){
                 throw new RuntimeException("NO HEX STR");
@@ -451,7 +336,8 @@ public class TestPufAC extends AppCompatActivity {
             byte [] binput = Util.toBytes(str_input);
 
             byte []res = usimpufhandler.EnterPacket(binput);
-            //byte []res = usimpufhandler.EnterPacket(str_input); //hex str 입력도 가능
+            // PUF에 입력값 넣고 리턴 값을 받는다.  예) 80000000 -> 80:instruction,  00:p1 ,0000:p2
+            // 해당 명령어와 p1,p2는 데이터 시트 확인 요망
 
             String restext = String.format("OK!!\n\nINPUT:%s(%d)\n\nOUTPUT:%s(%d)\n\n",
                     Util.toHexStr(binput),binput.length,
